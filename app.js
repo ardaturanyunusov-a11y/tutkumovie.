@@ -1,4 +1,3 @@
-// Film Listesi (Örnek Afişler)
 const movies = [
   { title: "Inception", img: "https://image.tmdb.org/t/p/w500/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg" },
   { title: "Interstellar", img: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
@@ -7,18 +6,16 @@ const movies = [
 ];
 
 let currentMovieIndex = 0;
-let roomCode = "";
 
-// Oda Oluşturma Butonu
+// Ana Sayfa Butonları
 const createBtn = document.getElementById("create-room-btn");
 if (createBtn) {
   createBtn.addEventListener("click", () => {
-    const randomCode = Math.floor(100000 + Math.random() * 900000); // 6 haneli rastgele kod
+    const randomCode = Math.floor(100000 + Math.random() * 900000);
     window.location.href = `room.html?room=${randomCode}`;
   });
 }
 
-// Odaya Katılma Butonu
 const joinBtn = document.getElementById("join-room-btn");
 if (joinBtn) {
   joinBtn.addEventListener("click", () => {
@@ -26,19 +23,24 @@ if (joinBtn) {
     if (codeInput) {
       window.location.href = `room.html?room=${codeInput}`;
     } else {
-      alert("Lütfen geçerli bir oda kodu girin!");
+      alert("Zəhmət olmasa otaq kodu daxil edin!");
     }
   });
 }
 
-// Oda Sayfası İşlemleri
+// Otaq Səhifəsi
 const displayRoomCode = document.getElementById("display-room-code");
 if (displayRoomCode) {
   const urlParams = new URLSearchParams(window.location.search);
-  roomCode = urlParams.get("room");
-  displayRoomCode.textContent = roomCode ? roomCode : "Bilinmiyor";
-  
-  loadMovie();
+  const roomCode = urlParams.get("room");
+  displayRoomCode.textContent = roomCode ? roomCode : "Bilinmir";
+
+  // Simulyasiya: 3 saniyə sonra "yeni adam qoşuldu" kimi fırlanmanı dayandırıb filmləri göstərək
+  setTimeout(() => {
+    document.getElementById("waiting-screen").style.display = "none";
+    document.getElementById("movie-container").style.display = "block";
+    loadMovie();
+  }, 3000);
 }
 
 function loadMovie() {
@@ -46,24 +48,41 @@ function loadMovie() {
     document.getElementById("movie-title").textContent = movies[currentMovieIndex].title;
     document.getElementById("movie-img").src = movies[currentMovieIndex].img;
   } else {
-    document.getElementById("movie-container").innerHTML = "<h2>Tüm filmleri incelediniz! 🎬</h2>";
+    document.getElementById("movie-container").innerHTML = "<h2 style='padding:20px;'>Bütün filmlərə baxdınız! 🎬</h2>";
   }
 }
 
-// Beğen / Beğenme Butonları
+// Bəyən / Bəyənmə
 const likeBtn = document.getElementById("like-btn");
 const dislikeBtn = document.getElementById("dislike-btn");
 
 if (likeBtn) {
-  likeBtn.addEventListener("click", () => {
-    currentMovieIndex++;
-    loadMovie();
+  likeBtn.addEventListener("click", () => { currentMovieIndex++; loadMovie(); });
+}
+if (dislikeBtn) {
+  dislikeBtn.addEventListener("click", () => { currentMovieIndex++; loadMovie(); });
+}
+
+// Chat Sistemi
+const sendBtn = document.getElementById("send-btn");
+const chatInput = document.getElementById("chat-input");
+const chatMessages = document.getElementById("chat-messages");
+
+if (sendBtn) {
+  sendBtn.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
   });
 }
 
-if (dislikeBtn) {
-  dislikeBtn.addEventListener("click", () => {
-    currentMovieIndex++;
-    loadMovie();
-  });
+function sendMessage() {
+  const text = chatInput.value.trim();
+  if (text) {
+    const msgDiv = document.createElement("div");
+    msgDiv.style.margin = "5px 0";
+    msgDiv.innerHTML = `<span style="color: #e50914; font-weight: bold;">Sən:</span> ${text}`;
+    chatMessages.appendChild(msgDiv);
+    chatInput.value = "";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 }
